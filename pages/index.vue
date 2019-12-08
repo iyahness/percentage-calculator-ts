@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col">
         <div class="statement-container">
-          <h2 class="statement text-uppercase">
+          <h2 class="statement">
             I want to know
           </h2>
         </div>
@@ -12,48 +12,102 @@
     <div class="row">
       <div class="col">
         <div class="choices">
-          <b-form-select v-model="selected" :options="options" />
+          <b-form-select class="dropdown" v-model="selected" :options="options" />
         </div>
       </div>
     </div>
-    <div class="input-container">
+    <div class="inputs">
       <div class="input-container savings" v-if="selected == 'savings'">
-        <b-input-group>
-          <b-form-input v-model="originalPrice" placeholder="0.00"></b-form-input>
-        </b-input-group>
-        <b-input-group>
-          <b-form-input v-model="discountedPrice" placeholder="0.00"></b-form-input>
-        </b-input-group>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-6">
+              <b-input-group>
+                <b-form-input class="input-field"
+                  v-model="originalPrice"
+                  placeholder="0.00">
+                </b-form-input>
+              </b-input-group>
+              <div class="field-label">
+                Original Price
+              </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6">
+            <b-input-group>
+              <b-form-input class="input-field"
+                v-model="discountedPrice"
+                placeholder="0.00">
+              </b-form-input>
+            </b-input-group>
+            <div class="field-label">
+              Discounted Price
+            </div>
+          </div>
+        </div>
       </div>
       <div class="input-container discount" v-if="selected == 'discount'">
-        <b-input-group>
-          <b-form-input v-model="originalPrice" placeholder="0.00"></b-form-input>
-        </b-input-group>
-        <b-input-group>
-          <b-form-input v-model="percentageDiscount" placeholder="0.00"></b-form-input>
-        </b-input-group>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-6">
+            <b-input-group>
+              <b-form-input class="input-field"
+                v-model="originalPrice"
+                placeholder="0.00">
+              </b-form-input>
+            </b-input-group>
+            <div class="field-label">
+              Original Price
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6">
+            <b-input-group>
+              <b-form-input class="input-field"
+                v-model="percentageDiscount"
+                placeholder="00">
+              </b-form-input>
+            </b-input-group>
+            <div class="field-label">
+              Discount (%)
+            </div>
+          </div>
+        </div>
       </div>
       <div class="input-container original" v-if="selected == 'original'">
-        <b-input-group>
-          <b-form-input v-model="discountedPrice" placeholder="0.00"></b-form-input>
-        </b-input-group>
-        <b-input-group>
-          <b-form-input v-model="percentageDiscount" placeholder="0.00"></b-form-input>
-        </b-input-group>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-6">
+            <b-input-group>
+              <b-form-input class="input-field"
+                v-model="discountedPrice"
+                placeholder="0.00">
+              </b-form-input>
+            </b-input-group>
+            <div class="field-label">
+              Discounted Price
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6">
+            <b-input-group>
+              <b-form-input class="input-field"
+                v-model="percentageDiscount"
+                placeholder="0.00">
+              </b-form-input>
+            </b-input-group>
+            <div class="field-label">
+              Discount (%)
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="output-container">
       <div class="row">
         <div class="col">
-          <div class="tagline">
+          <h3 class="tagline">
             {{ outputTagline }}
-          </div>
+          </h3>
         </div>
       </div>
       <div class="row">
         <div class="col">
           <div v-if="selected == 'savings'" class="main-output">
-            {{ percentageDiscount }}%
+            {{ percentageDiscount }}
           </div>
           <div v-if="selected == 'discount'" class="main-output">
             {{ discountedPrice }}
@@ -64,7 +118,11 @@
         </div>
       </div>
       <div class="row">
-        <div class="col">or</div>
+        <div class="col">
+          <h3 class="tagline">
+            or
+          </h3>
+        </div>
       </div>
       <div class="row">
         <div class="col">
@@ -81,9 +139,9 @@
 export default {
   data() {
     return {
-      discountedPrice: 160,
-      originalPrice: 200,
-      percentageDiscount: 20,
+      discountedPrice: 0,
+      originalPrice: 0,
+      percentageDiscount: 0,
       selected: 'savings',
       savings: 0,
       outputTagline: 'My discount is',
@@ -97,16 +155,25 @@ export default {
   mounted() {},
   methods: {
     computeDiscountedPrice() {
-      return this.originalPrice - (this.originalPrice * (this.percentageDiscount / 100));
+      this.discountedPrice = this.originalPrice
+        - (this.originalPrice * (this.percentageDiscount / 100));
     },
     computeOriginalPrice() {
-      return this.discountedPrice / (1 - this.percentageDiscount / 100);
+      this.originalPrice = this.discountedPrice / (1 - this.percentageDiscount / 100);
     },
     computeDiscount() {
-      return Math.round((1 - this.discountedPrice / this.originalPrice) * 100);
+      this.discountedPrice = Math.round((1 - this.discountedPrice / this.originalPrice) * 100);
     },
     computeSavings() {
-      return this.originalPrice - this.discountedPrice;
+      this.savings = this.originalPrice - this.discountedPrice;
+    },
+  },
+  watch: {
+    // eslint-disable-next-line object-shorthand
+    discountedPrice: function () {
+      this.computeOriginalPrice();
+      this.computeDiscount();
+      this.computeSavings();
     },
   },
 };
@@ -114,10 +181,56 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  margin: 72px auto 0 auto;
+  margin: auto;
   min-height: 100vh;
   justify-content: center;
   align-items: center;
+  padding: 24px 15px;
   text-align: center;
+  .choices {
+    display: inline-block;
+    .dropdown {
+      background-color: transparent;
+      border: 0;
+      color: #A83361;
+      font-family: 'Sarala', sans-serif;
+      text-align: center;
+      width: fit-content;
+      &:focus, &:active {
+        box-shadow: none;
+        outline: none;
+      }
+    }
+  }
+  .inputs {
+    padding: 48px 0 12px 0;
+    .input-container {
+      border-bottom: 2px solid white;
+      display: inline-block;
+      .input-field {
+        background: transparent;
+        border: 2px solid white;
+        border-radius: 0;
+        color: #A83361;
+        font-family: 'Sarala', sans-serif;
+        font-size: 36px;
+        height: 100px;
+        text-align: center;
+        width: 200px;
+      }
+      .field-label {
+        font-family: 'Titillium Web', sans-serif;
+        font-size: 18px;
+        padding: 12px 0 24px 0;
+      }
+    }
+  }
+  .output-container {
+    padding: 24px 0 0 0;
+    .main-output {
+      font-family: 'Sarala', sans-serif;
+      font-size: 36px;
+    }
+  }
 }
 </style>
