@@ -107,7 +107,7 @@
       <div class="row">
         <div class="col">
           <div v-if="selected == 'savings'" class="main-output">
-            {{ percentageDiscount }}
+            {{ percentageDiscount }}%
           </div>
           <div v-if="selected == 'discount'" class="main-output">
             {{ discountedPrice }}
@@ -120,7 +120,7 @@
       <div class="row">
         <div class="col">
           <h3 class="tagline">
-            or
+            or a savings of
           </h3>
         </div>
       </div>
@@ -146,7 +146,7 @@ export default {
       savings: 0,
       outputTagline: 'My discount is',
       options: [
-        { value: 'savings', text: 'how much discount will I get' },
+        { value: 'savings', text: 'how much discount I will get' },
         { value: 'discount', text: 'how much the discounted price is' },
         { value: 'original', text: 'how much the original price is' },
       ],
@@ -155,26 +155,90 @@ export default {
   mounted() {},
   methods: {
     computeDiscountedPrice() {
-      this.discountedPrice = this.originalPrice
-        - (this.originalPrice * (this.percentageDiscount / 100));
+      this.discountedPrice = (this.originalPrice
+        - (this.originalPrice
+        * (this.percentageDiscount / 100))).toFixed(2);
     },
     computeOriginalPrice() {
-      this.originalPrice = this.discountedPrice / (1 - this.percentageDiscount / 100);
+      this.originalPrice = (this.discountedPrice
+        / (1 - (this.percentageDiscount / 100))).toFixed(2);
     },
     computeDiscount() {
-      this.discountedPrice = Math.round((1 - this.discountedPrice / this.originalPrice) * 100);
+      this.percentageDiscount = (Math.round((1 - this.discountedPrice
+        / this.originalPrice) * 100)).toFixed(2);
     },
     computeSavings() {
-      this.savings = this.originalPrice - this.discountedPrice;
+      this.savings = (this.originalPrice - this.discountedPrice).toFixed(2);
     },
   },
   watch: {
     // eslint-disable-next-line object-shorthand
     discountedPrice: function () {
-      this.computeOriginalPrice();
-      this.computeDiscount();
+      switch (this.selected) {
+        case 'savings':
+          this.computeDiscount();
+          break;
+        case 'original':
+          this.computeOriginalPrice();
+          break;
+        default:
+          break;
+      }
       this.computeSavings();
     },
+    // eslint-disable-next-line object-shorthand
+    originalPrice: function () {
+      switch (this.selected) {
+        case 'savings':
+          this.computeDiscount();
+          break;
+        case 'discount':
+          this.computeDiscountedPrice();
+          break;
+        default:
+          break;
+      }
+      this.computeSavings();
+    },
+    // eslint-disable-next-line object-shorthand
+    percentageDiscount: function () {
+      switch (this.selected) {
+        case 'discount':
+          this.computeDiscountedPrice();
+          break;
+        case 'original':
+          this.computeOriginalPrice();
+          break;
+        default:
+          break;
+      }
+      this.computeSavings();
+    },
+    // eslint-disable-next-line object-shorthand
+    selected: function () {
+      switch (this.selected) {
+        case 'discount':
+          this.outputTagline = 'The discounted price is';
+          break;
+        case 'savings':
+          this.outputTagline = 'My discount is';
+          break;
+        case 'original':
+          this.outputTagline = 'The original price is';
+          break;
+        default:
+          break;
+      }
+    },
+  },
+  head() {
+    return {
+      title: 'Percentage Calculator',
+      meta: [
+        // hid is used as unique identifier. Do not use `vmid` for it as it will not work
+        // { hid: 'description', name: 'description', content: 'Software Engineer' }
+      ],
+    };
   },
 };
 </script>
@@ -227,6 +291,9 @@ export default {
   }
   .output-container {
     padding: 24px 0 0 0;
+    .tagline {
+      font-size: 24px;
+    }
     .main-output {
       font-family: 'Sarala', sans-serif;
       font-size: 36px;

@@ -58,4 +58,7 @@ export default {
          */
     extend(config, ctx) {},
   },
+  router: {
+   base: '/percentage-calculator/'
+ }
 };
